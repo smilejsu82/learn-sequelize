@@ -2,15 +2,20 @@ const path = require('path');
 const Sequelize = require('sequelize');
 
 const env = process.env.NODE_ENV || 'development';
-const config = requre(__dirname  + './../config/config.json')[env];
+const config = require(__dirname  + './../config/config.json')[env];
 const db = {};
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.User = requre('./user')(sequelize, Sequelize);
-db.Comment = requre('./comment')(sequelize, Sequelize);
+// 모델 연결 
+db.User = require('./user')(sequelize, Sequelize);
+db.Comment = require('./comment')(sequelize, Sequelize);
+
+//관계설정 
+db.User.hasMany(db.Comment, { foreignKey : 'commenter', sourceKey: 'id' });
+db.Comment.belongsTo(db.User, { foreignKey : 'commenter', targetKey: 'id' });
 
 
 module.exports = db;
